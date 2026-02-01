@@ -2,6 +2,7 @@ package game
 
 import (
 	"log"
+	"tictactoe-server/message"
 )
 
 type Room struct {
@@ -34,17 +35,16 @@ func (r *Room) AddPlayer(p Player, index int) {
 
 func (r *Room) StartGame() {
 	r.Turn = 0
-
-	r.Players[0].Send(map[string]any{
-		"type":        "START",
-		"playerIndex": 0,
-		"size":        r.Size,
+	r.Players[0].Send(message.Message{
+		Type:   string(message.Start),
+		Player: 0,
+		Size:   r.Size,
 	})
 
-	r.Players[1].Send(map[string]any{
-		"type":        "START",
-		"playerIndex": 1,
-		"size":        r.Size,
+	r.Players[1].Send(message.Message{
+		Type:   string(message.Start),
+		Player: 0,
+		Size:   r.Size,
 	})
 }
 
@@ -80,67 +80,35 @@ func (r *Room) MakeMove(p Player, cell int) {
 	r.Board[cell] = playerValue
 
 	//  Win check
-	if checkWin(r.Board, r.Size, playerValue) {
+	if CheckWin(r.Board, r.Size, playerValue) {
 		r.Over = true
-		r.Broadcast(map[string]any{
-			"type":   "GAME_OVER",
-			"winner": p.GetIndex(),
-			"board":  r.Board,
+		r.Broadcast(message.Message{
+			Type:   string(message.GameOver),
+			Winner: p.GetIndex(),
+			Board:  r.Board,
 		})
 		return
 	}
 	//  Draw check
-	if checkDraw(r.Board) {
+	if CheckDraw(r.Board) {
 		r.Over = true
-		r.Broadcast(map[string]any{
-			"type":  "GAME_DRAW",
-			"board": r.Board,
+		r.Broadcast(message.Message{
+			Type:  string(message.GameDraw),
+			Board: r.Board,
 		})
 		return
 	}
 	r.Turn = 1 - r.Turn
 	log.Println("SERVER: Broadcasting MOVE, turn:", r.Turn)
-	r.Broadcast(map[string]any{
-		"type":  "MOVE",
-		"board": r.Board,
-		"turn":  r.Turn,
+	r.Broadcast(message.Message{
+		Type:  string(message.MoveUpdate),
+		Board: r.Board,
+		Turn:  r.Turn,
 	})
-}
-
-func (r *Room) RematchingRequest(p Player) {
-	if !r.Over {
-		return
-	}
-	player_index := p.GetIndex()
-	r.RematchRequest[player_index] = true
-	log.Println("REMATCH_REQUEST from player", player_index)
-
-	r.Broadcast(map[string]any{
-		"type":     "REMATCH_UPDATE",
-		"accepted": r.RematchRequest,
-	})
-	if r.RematchRequest[0] && r.RematchRequest[1] {
-		r.ResetMatch()
-	}
-}
-
-func (r *Room) ResetMatch() {
-	r.Board = make([]int, r.Size*r.Size)
-	r.Turn = 0
-	r.Over = false
-	r.RematchRequest = [2]bool{false, false}
-
-	r.Broadcast(map[string]any{
-		"type":  "REMATCH_START",
-		"board": r.Board,
-		"turn":  r.Turn,
-	})
-
 }
 
 // broadcast helper
-
-func (r *Room) Broadcast(msg any) {
+func (r *Room) Broadcast(msg message.Message) {
 	for _, p := range r.Players {
 		if p != nil {
 			p.Send(msg)

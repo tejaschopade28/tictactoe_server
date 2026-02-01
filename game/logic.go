@@ -36,7 +36,7 @@ func checkAntiDiagonal(board []int, size, player int) bool {
 	return true
 }
 
-func checkWin(board []int, size, player int) bool {
+func CheckWin(board []int, size, player int) bool {
 	for i := 0; i < size; i++ {
 		if checkRow(board, size, i, player) ||
 			checkCol(board, size, i, player) {
@@ -47,7 +47,7 @@ func checkWin(board []int, size, player int) bool {
 		checkAntiDiagonal(board, size, player)
 }
 
-func checkDraw(board []int) bool {
+func CheckDraw(board []int) bool {
 	for _, cell := range board {
 		if cell == 0 {
 			return false

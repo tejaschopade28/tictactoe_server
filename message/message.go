@@ -1,4 +1,4 @@
-package server
+package message
 
 type Message struct {
 	Type     string  `json:"type"`
@@ -7,5 +7,6 @@ type Message struct {
 	Cell     int     `json:"cell,omitempty"`
 	Winner   int     `json:"winner,omitempty"`
 	Player   int     `json:"player,omitempty"`
+	Size     int     `json:"size,omitempty"`
 	Accepted [2]bool `json:"accepted,omitempty"`
 }
