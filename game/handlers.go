@@ -14,7 +14,7 @@ func (m *Manager) HandleMove(p Player, cell int) {
 	//find room
 	room, ok := m.Rooms[p.GetRoomID()]
 	if !ok {
-		
+
 		return
 	}
 	//pass move to game logic
@@ -24,6 +24,17 @@ func (m *Manager) HandleMove(p Player, cell int) {
 func (m *Manager) HandleLeave(p Player) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	//remove from queue if present
+	for i, wp := range m.WaitingQueue {
+		if wp == p {
+			m.WaitingQueue = append(
+				m.WaitingQueue[:i],
+				m.WaitingQueue[i+1:]...,
+			)
+			return
+		}
+	}
 	roomId := p.GetRoomID()
 	if roomId == "" {
 		return
@@ -34,14 +45,6 @@ func (m *Manager) HandleLeave(p Player) {
 		return
 	}
 	log.Println("Server leave the room ", roomId)
-	// only waiting player in room
-	if m.Waiting != nil && m.Waiting.ID == roomId {
-		log.Println("Removing waiting room:", roomId)
-		m.Waiting = nil
-		delete(m.Rooms, roomId)
-		return
-	}
-
 	room.Broadcast(message.Message{
 		Type: string(message.OpponentLeft),
 	})

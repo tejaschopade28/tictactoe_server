@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		server.ServerWS(w, r)
 	})

@@ -9,9 +9,7 @@ import (
 )
 
 func (c *Client) reading() {
-
 	defer func() {
-		//c.hub.unregister <- c
 		// can be recover from paniic reading
 		if r := recover(); r != nil {
 			log.Println("reading panic recoverd,", r)

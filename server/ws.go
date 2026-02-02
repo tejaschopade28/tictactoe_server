@@ -25,10 +25,9 @@ func ServerWS(w http.ResponseWriter, r *http.Request) {
 		send: make(chan []byte, 256),
 	}
 
-	//client.hub.register <- client
-
 	log.Println("client connected")
 
 	go client.reading()
 	go client.writing()
+
 }

@@ -12,8 +12,8 @@ import (
 var GameManager = game.NewManager()
 
 type Client struct {
-	conn      *websocket.Conn //connection
-	PlayerId  string
+	conn *websocket.Conn //connection
+	//PlayerId  string
 	send      chan []byte // send msg
 	RoomID    string      // clients room id
 	Index     int         // 0 and 1 depends on which player the client is
