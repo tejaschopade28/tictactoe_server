@@ -28,6 +28,8 @@ func NewRoom(id string, size int) *Room {
 
 // adding player to room
 func (r *Room) AddPlayer(p Player, index int) {
+	log.Println("during addplayer")
+	log.Println("newplayer", index)
 	r.Players[index] = p
 	p.SetRoomID(r.ID)
 	p.SetIndex(index)
@@ -35,17 +37,31 @@ func (r *Room) AddPlayer(p Player, index int) {
 
 func (r *Room) StartGame() {
 	r.Turn = 0
-	r.Players[0].Send(message.Message{
-		Type:   string(message.Start),
-		Player: 0,
-		Size:   r.Size,
+	r.Over = false
+
+	log.Println("Starting game")
+	log.Println("start the game, player 0:", r.Players[0].GetIndex(), "player 1:", r.Players[1].GetIndex())
+
+	for i, p := range r.Players {
+		if p == nil {
+			log.Println("ERROR: player", i, "is nil")
+			return
+		}
+
+		p.Send(message.Message{
+			Type:   string(message.Start),
+			Player: i,
+			Size:   r.Size,
+		})
+	}
+
+	r.Broadcast(message.Message{
+		Type:  string(message.Move),
+		Board: r.Board,
+		Turn:  r.Turn,
 	})
 
-	r.Players[1].Send(message.Message{
-		Type:   string(message.Start),
-		Player: 0,
-		Size:   r.Size,
-	})
+	log.Println("START + initial MOVE sent")
 }
 
 func (r *Room) MakeMove(p Player, cell int) {
@@ -101,7 +117,7 @@ func (r *Room) MakeMove(p Player, cell int) {
 	r.Turn = 1 - r.Turn
 	log.Println("SERVER: Broadcasting MOVE, turn:", r.Turn)
 	r.Broadcast(message.Message{
-		Type:  string(message.MoveUpdate),
+		Type:  string(message.Move),
 		Board: r.Board,
 		Turn:  r.Turn,
 	})

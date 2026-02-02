@@ -12,9 +12,9 @@ const (
 
 // server to client
 const (
-	Start         Type = "START"
-	Waiting       Type = "WAITING"
-	MoveUpdate    Type = "MOVE"
+	Start   Type = "START"
+	Waiting Type = "WAITING"
+	//MoveUpdate    Type = "MOVE_UPDATE"
 	GameOver      Type = "GAME_OVER"
 	GameDraw      Type = "GAME_DRAW"
 	RematchUpdate Type = "REMATCH_UPDATE"

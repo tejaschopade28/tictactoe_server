@@ -9,6 +9,7 @@ import (
 )
 
 type Manager struct {
+	//Waiting *Room
 	Waiting *Room
 	Rooms   map[string]*Room
 	mu      sync.Mutex
@@ -26,7 +27,9 @@ func (m *Manager) Join(p Player) {
 	if m.Waiting == nil {
 		RoomId := uuid.NewString()
 		room := NewRoom(RoomId, 3) // (roomid , size)
+
 		room.AddPlayer(p, 0)
+		log.Println("after Addplayer")
 		m.Waiting = room
 		m.Rooms[room.ID] = room
 		p.Send(message.Message{

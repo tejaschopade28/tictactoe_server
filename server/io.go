@@ -22,21 +22,24 @@ func (c *Client) reading() {
 	}()
 	for {
 		_, payload, err := c.conn.ReadMessage()
+
 		if err != nil {
 			log.Println("Read error!")
 			break
 		}
 
 		var msg message.Message
+		log.Printf("RAW MSG: %s\n", string(payload))
 		if err := json.Unmarshal(payload, &msg); err != nil {
-			log.Println("JSON unmarhal Error", err)
+			log.Println("JSON unmarshal Error:", err)
 			continue
 		}
-		log.Printf("RAW MSG: %s\n", string(payload))
+
+		log.Printf("Parsed Msg: %+v\n", msg)
 
 		handler, ok := handlers[message.Type(msg.Type)]
 		if !ok {
-			log.Println("UNKNOWN TYPE:", msg.Type)
+			log.Println("UNKNOWN TYPE:", msg.Type, " ", message.Type(msg.Type))
 			continue
 		}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sync"
 	"tictactoe-server/game"
+	"tictactoe-server/message"
 
 	"github.com/gorilla/websocket"
 )
@@ -12,15 +13,17 @@ var GameManager = game.NewManager()
 
 type Client struct {
 	conn      *websocket.Conn //connection
-	send      chan []byte     // send msg
-	RoomID    string          // clients room id
-	Index     int             // 0 and 1 depends on which player the client is
+	PlayerId  string
+	send      chan []byte // send msg
+	RoomID    string      // clients room id
+	Index     int         // 0 and 1 depends on which player the client is
 	closeOnce sync.Once
 }
 
-func (c *Client) Send(msg any) {
+func (c *Client) Send(msg message.Message) {
 	data, err := json.Marshal(msg)
 	if err != nil {
+		println("error in sendding data", err)
 		return
 	}
 	c.send <- data

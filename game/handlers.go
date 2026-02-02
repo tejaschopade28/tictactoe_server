@@ -14,6 +14,7 @@ func (m *Manager) HandleMove(p Player, cell int) {
 	//find room
 	room, ok := m.Rooms[p.GetRoomID()]
 	if !ok {
+		
 		return
 	}
 	//pass move to game logic
